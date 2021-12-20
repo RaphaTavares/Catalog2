@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 
 namespace APICatalogo.Models
 {
@@ -6,7 +7,7 @@ namespace APICatalogo.Models
     {
         public Categoria()
         {
-            Produtos = new CollectionExtensions<Produto>();
+            Produtos = new Collection<Produto>();
         }
         public int CategoriaId { get; set; }
         public string Nome { get; set; }
