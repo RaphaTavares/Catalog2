@@ -12,6 +12,7 @@ using Microsoft.OpenApi.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 using System.Threading.Tasks;
 
 namespace APICatalogo
@@ -32,7 +33,11 @@ namespace APICatalogo
             services.AddControllers();
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
 
-            services.AddDbContext<AppDbContext>(options =>
+            services.AddControllers().AddJsonOptions(x =>
+         x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
+
+
+            services.AddDbContextPool<AppDbContext>(options =>
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
             services.AddSwaggerGen(c =>
             {
