@@ -37,7 +37,7 @@ namespace APICatalogo
          x.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.Preserve);
 
 
-            services.AddDbContextPool<AppDbContext>(options =>
+            services.AddDbContext<AppDbContext>(options =>
             options.UseMySql(connectionString, ServerVersion.AutoDetect(connectionString)));
             services.AddSwaggerGen(c =>
             {

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace APICatalogo.Controllers
 {
@@ -20,11 +21,11 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet("produtos")]
-        public ActionResult<IEnumerable<Categoria>> GetCategoriasProdutos()
+        public async Task<ActionResult<IEnumerable<Categoria>>> GetCategoriasProdutos()
         {
             try
             {
-                return _context.Categoria.Include(x => x.Produtos).ToList();
+                return await _context.Categoria.Include(x => x.Produtos).ToListAsync();
 
             }
             catch (System.Exception)
@@ -34,11 +35,11 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Categoria>> Get()
+        public async Task<ActionResult<IEnumerable<Categoria>>> Get()
         {
             try
             {
-                return _context.Categoria.AsNoTracking().ToList();
+                return await _context.Categoria.AsNoTracking().ToListAsync();
             }
             catch (System.Exception)
             {
@@ -49,11 +50,11 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet("{id}", Name = "ObterCategoria")]
-        public ActionResult<Categoria> Get(int id)
+        public async Task<ActionResult<Categoria>> Get(int id)
         {
             try
             {
-                var categoria = _context.Categoria.AsNoTracking().FirstOrDefault(categoria => categoria.CategoriaId == id);
+                var categoria = await _context.Categoria.AsNoTracking().FirstOrDefaultAsync(categoria => categoria.CategoriaId == id);
 
                 if (categoria == null)
                 {
@@ -69,12 +70,12 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody]Categoria categoria)
+        public async Task<ActionResult> Post([FromBody]Categoria categoria)
         {
             try
             {
-                _context.Categoria.Add(categoria);
-                _context.SaveChanges();
+                await _context.Categoria.AddAsync(categoria);
+                await _context.SaveChangesAsync();
 
                 return new CreatedAtRouteResult("ObterCategoria", new { id = categoria.CategoriaId }, categoria);
             }
@@ -86,7 +87,7 @@ namespace APICatalogo.Controllers
             }
 
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] Categoria categoria)
+        public async Task<ActionResult> Put(int id, [FromBody] Categoria categoria)
         {
 
             try
@@ -96,7 +97,7 @@ namespace APICatalogo.Controllers
                     return BadRequest($"não foi possível atualizar a categoria com id={id}");
                 }
                 _context.Entry(categoria).State = EntityState.Modified;
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return Ok($"A categoria com id={id} foi atualizada com sucesso");
             }
             catch (System.Exception)
@@ -107,18 +108,18 @@ namespace APICatalogo.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult<Categoria> Delete(int id)
+        public async Task<ActionResult<Categoria>> Delete(int id)
         {
             try
             {
-                var categoria = _context.Categoria.FirstOrDefault(categoria => categoria.CategoriaId == id);
+                var categoria = await _context.Categoria.FirstOrDefaultAsync(categoria => categoria.CategoriaId == id);
 
                 if (categoria is null)
                 {
                     return NotFound();
                 }
                 _context.Categoria.Remove(categoria);
-                _context.SaveChanges();
+                await _context.SaveChangesAsync();
                 return categoria;
             }
             catch (System.Exception)

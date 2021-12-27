@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace APICatalogo.Controllers
 {
@@ -20,11 +21,11 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet]
-        public ActionResult<IEnumerable<Produto>> Get()
+        public async Task<ActionResult<IEnumerable<Produto>>> Get()
         {
             try
             {
-                return _context.Produto.AsNoTracking().ToList();
+                return await _context.Produto.AsNoTracking().ToListAsync();
 
             }
             catch (System.Exception)
@@ -33,12 +34,12 @@ namespace APICatalogo.Controllers
             }
         }
 
-        [HttpGet("{id}", Name  = "ObterProduto")]
-        public ActionResult<Produto> Get(int id)
+        [HttpGet("{id:int:min(1)}", Name  = "ObterProduto")]
+        public async Task<ActionResult<Produto>> Get(int id)
         {
             try
             {
-                var produto = _context.Produto.AsNoTracking().FirstOrDefault(p => p.ProdutoId == id);
+                var produto = await _context.Produto.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id);
 
                 if (produto == null)
                 {
@@ -54,12 +55,12 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
-        public ActionResult Post([FromBody]Produto produto)
+        public async Task<ActionResult> Post([FromBody]Produto produto)
         {
             try
             {
-                _context.Produto.Add(produto);
-                _context.SaveChanges();
+                await _context.Produto.AddAsync(produto);
+                await _context.SaveChangesAsync();
 
                 return new CreatedAtRouteResult("ObterProduto", new { id = produto.ProdutoId }, produto);
 
@@ -71,7 +72,7 @@ namespace APICatalogo.Controllers
             }
 
         [HttpPut("{id}")]
-        public ActionResult Put(int id, [FromBody] Produto produto)
+        public async Task<ActionResult> Put(int id, [FromBody] Produto produto)
         {
             try
             {
@@ -80,8 +81,9 @@ namespace APICatalogo.Controllers
                     return BadRequest("Id inexistente no banco");
                 }
 
-                _context.Entry(produto).State = EntityState.Modified;
-                _context.SaveChanges();
+                //_context.Entry(produto).State = EntityState.Modified;
+                _context.Produto.Update(produto);
+                await _context.SaveChangesAsync();
                 return Ok("Produto atualizado com sucesso");
             }
             catch (System.Exception)
@@ -91,11 +93,11 @@ namespace APICatalogo.Controllers
         }
 
         [HttpDelete("{id}")]
-        public ActionResult<Produto> Delete(int id)
+        public Task<ActionResult<Produto>> Delete(int id)
         {
             try
             {
-                var produto = _context.Produto.FirstOrDefault(p => p.ProdutoId == id);
+                var produto = await _context.Produto.FirstOrDefaultAsync(p => p.ProdutoId == id);
                 // var produto = _context.Produto.Find(id);
 
                 if (produto is null)
