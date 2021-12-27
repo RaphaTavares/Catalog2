@@ -16,10 +16,10 @@ namespace APICatalogo.Models
         [Key]
         public int CategoriaId { get; set; }
         
-        //[Required]
+        [Required]
         [MaxLength(80)]
         public string Nome { get; set; }
-        //[Required]
+        [Required]
         [MaxLength(300)]
         public string ImagemUrl { get; set; }
         public ICollection<Produto> Produtos { get; set; }
