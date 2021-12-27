@@ -93,7 +93,7 @@ namespace APICatalogo.Controllers
         }
 
         [HttpDelete("{id}")]
-        public Task<ActionResult<Produto>> Delete(int id)
+        public async Task<ActionResult<Produto>> Delete(int id)
         {
             try
             {
