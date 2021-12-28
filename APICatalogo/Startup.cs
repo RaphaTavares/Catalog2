@@ -1,4 +1,6 @@
 using APICatalogo.Context;
+using APICatalogo.Extensions;
+using APICatalogo.Filters;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -29,7 +31,7 @@ namespace APICatalogo
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-
+            services.AddScoped<ApiLoggingFilter>();
             services.AddControllers();
             string connectionString = Configuration.GetConnectionString("DefaultConnection");
 
@@ -54,6 +56,8 @@ namespace APICatalogo
                 app.UseSwagger();
                 app.UseSwaggerUI(c => c.SwaggerEndpoint("/swagger/v1/swagger.json", "APICatalogo v1"));
             }
+
+            app.ConfigureExceptionHandler();
 
             app.UseHttpsRedirection();
 

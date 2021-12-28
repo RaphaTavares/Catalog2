@@ -7,7 +7,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace APICatalogo.Models
 {
     [Table("Produtos")]
-    public class Produto : IValidatableObject
+    public class Produto 
     {
         [Key]
         public int ProdutoId { get; set; }
@@ -39,6 +39,8 @@ namespace APICatalogo.Models
 
         public int CategoriaId { get; set; }
 
+
+        //to use this method, the model should implement the "IValidatableObject" interface
         /*
         public IEnumerable<ValidationResult> Validate(ValidationContext validationContext)
         {
