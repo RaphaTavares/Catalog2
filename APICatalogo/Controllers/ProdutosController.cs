@@ -1,13 +1,10 @@
-﻿using APICatalogo.Context;
-using APICatalogo.Filters;
+﻿using APICatalogo.Filters;
 using APICatalogo.Models;
+using APICatalogo.Repository;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace APICatalogo.Controllers
 {
@@ -16,19 +13,26 @@ namespace APICatalogo.Controllers
     public class ProdutosController: ControllerBase
     {
 
-        private readonly AppDbContext _context;
-        public ProdutosController(AppDbContext contexto)
+        private readonly IUnitOfWork _uof;
+        public ProdutosController(IUnitOfWork unitOfWork)
         {
-            _context = contexto;
+            _uof = unitOfWork;
         }
+
+        [HttpGet("menorpreco")]
+        public ActionResult<IEnumerable<Produto>> GetProdutosPrecos()
+        {
+            return _uof.ProdutoRepository.GetProdutosPorPreco().ToList();
+        }
+
 
         [HttpGet]
         [ServiceFilter(typeof(ApiLoggingFilter))]
-        public async Task<ActionResult<IEnumerable<Produto>>> Get()
+        public ActionResult<IEnumerable<Produto>> Get()
         {
             try
             {
-                return await _context.Produto.AsNoTracking().ToListAsync();
+                return _uof.ProdutoRepository.Get().ToList();
 
             }
             catch (System.Exception)
@@ -38,11 +42,11 @@ namespace APICatalogo.Controllers
         }
 
         [HttpGet("{id:int:min(1)}", Name  = "ObterProduto")]
-        public async Task<ActionResult<Produto>> Get(int id)
+        public ActionResult<Produto> Get(int id)
         {
             try
             {
-                var produto = await _context.Produto.AsNoTracking().FirstOrDefaultAsync(p => p.ProdutoId == id);
+                var produto = _uof.ProdutoRepository.GetById(p => p.ProdutoId == id);
 
                 if (produto == null)
                 {
@@ -58,12 +62,12 @@ namespace APICatalogo.Controllers
         }
 
         [HttpPost]
-        public async Task<ActionResult> Post([FromBody]Produto produto)
+        public ActionResult Post([FromBody]Produto produto)
         {
             try
             {
-                await _context.Produto.AddAsync(produto);
-                await _context.SaveChangesAsync();
+                 _uof.ProdutoRepository.Add(produto);
+                _uof.Commit();
 
                 return new CreatedAtRouteResult("ObterProduto", new { id = produto.ProdutoId }, produto);
 
@@ -75,7 +79,7 @@ namespace APICatalogo.Controllers
             }
 
         [HttpPut("{id}")]
-        public async Task<ActionResult> Put(int id, [FromBody] Produto produto)
+        public ActionResult Put(int id, [FromBody] Produto produto)
         {
             try
             {
@@ -84,9 +88,9 @@ namespace APICatalogo.Controllers
                     return BadRequest("Id inexistente no banco");
                 }
 
-                //_context.Entry(produto).State = EntityState.Modified;
-                _context.Produto.Update(produto);
-                await _context.SaveChangesAsync();
+                //_uof.Entry(produto).State = EntityState.Modified;
+                _uof.ProdutoRepository.Update(produto);
+                 _uof.Commit();
                 return Ok("Produto atualizado com sucesso");
             }
             catch (System.Exception)
@@ -96,20 +100,20 @@ namespace APICatalogo.Controllers
         }
 
         [HttpDelete("{id}")]
-        public async Task<ActionResult<Produto>> Delete(int id)
+        public ActionResult<Produto> Delete(int id)
         {
             try
             {
-                var produto = await _context.Produto.FirstOrDefaultAsync(p => p.ProdutoId == id);
-                // var produto = _context.Produto.Find(id);
+                var produto = _uof.ProdutoRepository.GetById(p => p.ProdutoId == id);
+                // var produto = _uof.Produto.Find(id);
 
                 if (produto is null)
                 {
                     return NotFound("Produto não existe");
                 }
 
-                _context.Produto.Remove(produto);
-                _context.SaveChanges();
+                _uof.ProdutoRepository.Delete(produto);
+                _uof.Commit();
                 return produto;
             }
             catch (System.Exception)
