@@ -13,6 +13,7 @@ namespace APICatalogo.Repository
         public ProdutoRepository(AppDbContext contexto) : base(contexto)
         { }
 
+        /*
         public IEnumerable<Produto> GetProdutos(ProdutosParameters produtosParameters)
         {
             return Get()
@@ -20,6 +21,12 @@ namespace APICatalogo.Repository
                 .Skip((produtosParameters.pageNumber - 1) * produtosParameters.PageSize)
                 .Take(produtosParameters.PageSize)
                 .ToList();
+        } 
+        */
+
+        public PagedList<Produto> GetProdutos(ProdutosParameters produtosParameters)
+        {
+            return PagedList<Produto>.ToPagedList(Get().OrderBy(on => on.ProdutoId), produtosParameters.PageNumber, produtosParameters.PageSize);
         }
 
         public IEnumerable<Produto> GetProdutosPorPreco()
@@ -28,3 +35,4 @@ namespace APICatalogo.Repository
         }
     }
 }
+;
