@@ -159,7 +159,7 @@ namespace APICatalogo.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, "Não foi possível deletar o produto");
             }
-            
+            //test
         }
     }
 }
